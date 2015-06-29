@@ -1,0 +1,325 @@
+/*
+ * Author: Kevin A George
+ Program to demonstrate the operations such as read,wrie and delete from a file
+ */
+package Assignment;
+
+import static Assignment.DetailsFrame.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author kevin
+ */
+public class Fileoperations {
+    
+    /* 
+   class for incorporating operations involving file such as  
+   reading from file , writing to file ,saving and deleting
+    
+    */
+    String dataFileName = "../input.txt";
+     
+    public String ReadFromFile(){
+        
+        /*  
+        Method reads data from file and displays data in table
+        
+        */
+        /**
+         * Creating a buffered reader to read the file
+         */
+    try {
+	BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
+        String line;
+        StringBuilder strbuf = new StringBuilder();
+         /**
+         * Looping the read block until all lines in the file are read.
+         */
+        while ((line = bReader.readLine()) != null) {
+
+            /**
+             * Splitting the content of tabbed separated line
+             */
+            String datavalue[] = line.split("\t");     
+            // adding row to table
+            tablemodel.addRow(new Object[]{datavalue[0],datavalue[2],datavalue[8]});
+        }       
+        
+         bReader.close();
+  //  return null;
+      }
+    catch(ArrayIndexOutOfBoundsException|FileNotFoundException e) {}
+    
+     catch(IOException e){}
+    
+    return null;
+        }
+
+     public String WriteToFile()
+     {
+        int row,column;
+         try {
+           /**
+         * Creating a buffered reader to read the file and buffered write to write to file
+         */
+             
+            FileWriter fw= new FileWriter(dataFileName,true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            StringBuffer completestring = new StringBuffer();
+	    BufferedReader reader = new BufferedReader(new FileReader(dataFileName));
+            String line ; 
+             /**
+                 * Looping the read block until all lines in the file are read.
+                 */   
+            while ((line= reader.readLine())!=null)
+                    {
+                       /**
+             * Splitting the content of tabbed separated line
+             */
+                        String[] datavalue=line.split("\t");
+                         /**
+                       * Checking whether the same record is already present in file
+                       */
+                       if(((datavalue[0].toUpperCase()).equals(Firstnamefield.getText().toUpperCase()))&&((datavalue[2].toUpperCase()).equals(Lastnamefield.getText().toUpperCase()))){
+                         return "false" ;             
+                        }
+                       
+                    }
+            /* appending to a string buffer object and writing 
+            the object to file using buffered writer object */
+            completestring.append(Firstnamefield.getText()).append("\t").append(Middlenamefield.getText()).append("\t").append(Lastnamefield.getText()).append("\t").append(Address1field.getText()).append("\t").append(Address2field.getText()).append("\t").append(Cityfield.getText()).append("\t").append(Statefield.getText()).append("\t").append(Zipcodefield.getText()).append("\t").append(Phonenumberfield.getText()).append("\t").append(Genderfield.getSelectedItem().toString()).append("\t").append(Countryfield.getText().toString()).append("\t").append(Emailfield.getText());
+           
+            bw.write(completestring.toString());
+            bw.newLine();
+            bw.close();fw.close();
+            return "true";
+         } catch (IOException ex) {
+            Logger.getLogger(Fileoperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         
+         return null;
+     }
+    /*
+     Method to update a file
+     */
+ public String SaveToFile ()
+         {
+                    /*
+             creating variables that store file name,input file and temporary file
+             */ 
+                     String line = null;  
+                     String dataFileName = "../input.txt";
+                     String tempfilename = "../temp.txt";
+                    
+
+             try {  
+                 /**
+         * Creating a buffered reader to read the file , file pointers for pointing to 
+         * input file and temporary file . Creating a buffered write to write to 
+         */
+                 
+                 File oldfile= new File(dataFileName);
+                 File tempfile= new File(tempfilename);
+                 
+                 BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
+                 FileWriter fw= new FileWriter(tempfilename);
+            
+                 BufferedWriter bw = new BufferedWriter(fw);
+                 StringBuffer completestring = new StringBuffer();
+                 StringBuffer bfr = new StringBuffer();
+                  /**
+                 * Looping the read block until all lines in the file are read.
+                 */               
+            
+                while ((line= bReader.readLine())!=null)
+                    {
+                      /**
+             * Splitting the content of tabbed separated line
+             */
+                     String[] datavalue=line.split("\t");
+                     bfr.delete(0, bfr.length());
+                     /*
+                     travering the file until the record to update comes and writing all traversed data 
+                     to temporary file
+                     */
+                     
+                     if(!datavalue[0].equals(Firstnamefield.getText()))
+                        {
+                            for(String word : datavalue)
+                            {
+                                bfr.append(word).append("\t");
+                            } 
+                           bw.write(bfr.toString());
+                            bw.newLine();
+                        }
+                    else
+                        {
+                            /*
+                            Identifying the record to update and writing the data from text field to the
+                            temp file and not the contents in original input file
+                            */
+                            bfr.append(Firstnamefield.getText()).append("\t").append(Middlenamefield.getText()).append("\t").append(Lastnamefield.getText()).append("\t").append(Address1field.getText()).append("\t").append(Address1field.getText()).append("\t").append(Cityfield.getText()).append("\t").append(Statefield.getText()).append("\t").append(Zipcodefield.getText()).append("\t").append(Phonenumberfield.getText()).append("\t").append(Genderfield.getSelectedItem().toString()).append("\t").append(Countryfield.getText()).append("\t").append(Emailfield.getText());   
+                             bw.write(bfr.toString());
+                             bw.newLine();
+                             bfr.delete(0, bfr.length());
+                        }
+                    }
+            
+                /*
+                closing buffered reader,buffered write and file reader
+                */
+            bw.close(); bReader.close(); fw.close();
+            
+            /*
+            Deleting old input file and renaming temp file to input file
+            */
+            Path fp1= oldfile.toPath();
+            Files.delete(fp1); 
+            tempfile.renameTo(oldfile);
+            return "true";
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Fileoperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          catch (IOException ex)
+          {
+              
+          }
+             
+             return null;
+         }
+/*
+ Method to delete a row from file and table
+ */
+ public String DeleteFromFile()
+    {
+                     String line = null;  
+                     String dataFileName = "../input.txt";
+                     String tempfilename = "../temp.txt";
+                     
+
+             try {  
+                 /**
+         * Creating a buffered reader to read the file , file pointers for pointing to 
+         * input file and temporary file . Creating a buffered write to write to 
+         */
+                 File oldfile= new File(dataFileName);
+                 File tempfile= new File(tempfilename);
+                 
+                 BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
+                 FileWriter fw= new FileWriter(tempfilename);
+            
+                 BufferedWriter bw = new BufferedWriter(fw);
+                 StringBuffer completestring = new StringBuffer();
+	     /**
+         * Looping the read block until all lines in the file are read.
+         */
+            
+                while ((line=bReader.readLine())!=null)
+                    {
+                      /**
+             * Splitting the content of tabbed separated line
+             */
+                     String[] datavalue=line.split("\t");
+                     completestring.delete(0, completestring.length());
+                     if(!datavalue[0].equals(tablemodel.getValueAt(Maintable.getSelectedRow(), 0).toString()))
+                        {
+                            /*
+                            Identifying the record to update and writing the data from text field to the
+                            temp file and not the contents in original input file
+                            */ 
+                            for(String word : datavalue)
+                            {
+                                completestring.append(word).append("\t");
+                            } 
+                           bw.write(completestring.toString());
+                            bw.newLine();
+                        }
+                   
+                    }
+                 /*
+                closing buffered reader,buffered write and file reader
+                */
+            bw.close(); bReader.close(); fw.close();
+             
+            /*
+            Deleting old input file and renaming temp file to input file
+            */           
+            Path fp1= oldfile.toPath();
+            Files.delete(fp1); 
+            tempfile.renameTo(oldfile);
+            return "true";
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Fileoperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+          catch (IOException ex)
+          {
+              
+          }
+     
+     return null;
+    }
+
+ public String selectedrow ()
+ {
+     try {
+	/**
+         * Creating a buffered reader to read the file 
+         */
+         BufferedReader bReader = new BufferedReader(new FileReader(dataFileName));
+        String line;
+        StringBuilder strbuf = new StringBuilder();
+         /**
+         * Looping the read block until all lines in the file are read.
+         */
+        while ((line = bReader.readLine()) != null) {
+
+            /**
+             * Splitting the content of tabbed separated line
+             */
+           String[] datavalue=line.split("\t");
+           /*
+           traversing the file until the record selected in table . then
+           displyaing the record from file to text fields
+           */
+            if(datavalue[0].equals(tablemodel.getValueAt(Maintable.getSelectedRow(), 0).toString()))
+                        {
+                             DetailsFrame.Firstnamefield.setText(datavalue[0]);
+                             DetailsFrame.Middlenamefield.setText(datavalue[1]);
+                             DetailsFrame.Lastnamefield.setText(datavalue[2]);
+                             DetailsFrame.Address1field.setText(datavalue[3]);
+                             DetailsFrame.Address2field.setText(datavalue[4]);
+                             DetailsFrame.Cityfield.setText(datavalue[5]);
+                             DetailsFrame.Statefield.setText(datavalue[6]);
+                             DetailsFrame.Zipcodefield.setText(datavalue[7]);
+                             DetailsFrame.Phonenumberfield.setText(datavalue[8]);
+                             DetailsFrame.Genderfield.setSelectedItem(datavalue[9]);
+                             DetailsFrame.Countryfield.setText(datavalue[10]);
+                             DetailsFrame.Emailfield.setText(datavalue[11]);
+                        }
+        }       
+        
+         bReader.close();
+  //  return null;
+      }
+    catch(ArrayIndexOutOfBoundsException|FileNotFoundException e) {}
+    
+     catch(IOException e){}
+       
+     return "true";
+  }
+ 
+}
